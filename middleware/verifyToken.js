@@ -25,7 +25,7 @@ const verifyToken = async (req, res, next) => {
         // console.log('userObject: ', userObject);
         console.log('verified!!');
     } catch (error) {
-        return res.status(403).json({ message: 'Forbidden' });
+        return res.status(403).json({ message: error.message });
     }
     next();
 };

@@ -2,6 +2,7 @@ require('dotenv').config();
 require('express-async-error');
 const admin = require('firebase-admin');
 const express = require('express');
+const errorHandler = require('./middleware/errorHandler');
 const path = require('path');
 const app = express();
 const verifyToken = require('./middleware/verifyToken');
@@ -49,9 +50,11 @@ app.use('/api/v1/todos', verifyToken, require('./routes/todoRoutes'));
 //     });
 
 // catch-all for 404 not found
-app.all('*', verifyToken, (req, res) => {
+app.all('*', (req, res) => {
     res.status(404).json({ msg: '404 Not Found' });
 });
+
+app.use(errorHandler);
 
 mongoose.connection.once('open', () => {
     console.log(`Connected to mongoDB`);
