@@ -1,17 +1,19 @@
 require('dotenv').config();
 require('express-async-error');
-const admin = require('firebase-admin');
 const express = require('express');
+const mongoose = require('mongoose');
+const admin = require('firebase-admin');
+const cors = require('cors');
 const errorHandler = require('./middleware/errorHandler');
-const path = require('path');
-const app = express();
 const verifyToken = require('./middleware/verifyToken');
 const connectDB = require('./config/dbConnection');
-const { default: mongoose } = require('mongoose');
+
 const PORT = process.env.PORT || 3500;
 
+const app = express();
 connectDB();
 app.use(express.json());
+app.use(cors());
 
 const useEmulator = true;
 if (useEmulator) {
@@ -32,22 +34,6 @@ const defaultApp = admin.initializeApp({
 
 // Only check token for specific route:
 app.use('/api/v1/todos', verifyToken, require('./routes/todoRoutes'));
-
-// Used to create new user with Emulator auth (check it's UI)
-//
-// admin
-//     .auth()
-//     .createUser({
-//         displayName: 'John Doe',
-//         email: 'user@example.com',
-//         password: 'secretPassword',
-//     })
-//     .then((user) => {
-//         console.log('Successfully created new user:', user);
-//     })
-//     .catch((error) => {
-//         console.log('Error creating new user:', error);
-//     });
 
 // catch-all for 404 not found
 app.all('*', (req, res) => {

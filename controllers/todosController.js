@@ -8,9 +8,9 @@ const mongoose = require('mongoose');
  */
 const getAllTodos = async (req, res) => {
     const { uid } = req.user;
-
+    // console.log(' in getAllTodos');
     const todos = await Todo.find({ uid: uid });
-    console.log('🚀 ~ file: todosController.js:14 ~ getAllTodos ~ todos', todos);
+    // console.log('🚀 ~ file: todosController.js:14 ~ getAllTodos ~ todos', todos);
 
     if (!todos?.length) {
         return res.status(200).json({ msg: `No todos found with uid ${uid}` });
@@ -24,12 +24,21 @@ const getAllTodos = async (req, res) => {
  * @access Private
  */
 const createNewTodo = async (req, res) => {
+    const { isAnonymous } = req.user; // Injected from middleware verifyToken
     const { uid, title } = req.body;
+
     if (!uid || !title) {
         return res.status(400).json({ msg: `No uid or title` });
     }
+    let newTodo;
+    if (!isAnonymous) {
+        newTodo = await Todo.create({ uid: uid, title: title });
+    } else {
+        const date = new Date();
+        date.setMinutes(date.getMinutes() + 5); // 2880 mins === two days
+        newTodo = await Todo.create({ uid: uid, title: title, expireAt: date });
+    }
 
-    const newTodo = Todo.create({ uid: uid, title: title });
     if (newTodo) {
         return res.status(201).json({ msg: 'New todo has been created' });
     } else {
@@ -44,7 +53,7 @@ const createNewTodo = async (req, res) => {
  */
 
 const updateTodo = async (req, res) => {
-    const { uid, todoId, title, completed } = req.body;
+    const { uid, _id: todoId, title, completed } = req.body;
 
     // findById(): Finds a single document by its _id field
     const todo = await Todo.findById(todoId).exec();
@@ -55,7 +64,6 @@ const updateTodo = async (req, res) => {
     todo.title = title;
     todo.completed = completed;
     const updatedTodo = await todo.save();
-    // console.log('🚀 ~ file: todosController.js:58 ~ updateTodo ~ updatedTodo', updatedTodo);
 
     return res.status(200).json({ msg: `Todo updated. id: ${updatedTodo._id}` });
     // return res.status(200).json({ msg: `Todo updated` });
@@ -68,7 +76,9 @@ const updateTodo = async (req, res) => {
  */
 
 const deleteTodo = async (req, res) => {
-    const { todoId } = req.body;
+    const { _id: todoId } = req.body;
+    // console.log('🚀 ~ file: todosController.js:72 ~ deleteTodo ~ req.body', req.body);
+
     if (!todoId) {
         return res.status(400).json({ msg: 'TodoId required' });
     }

@@ -6,8 +6,13 @@ const createUserIfNotExist = async (userObj) => {
         // console.log(`duplicated: ${JSON.stringify(duplicate)}`);
         return;
     }
-
-    const user = await User.create(userObj);
+    if (!userObj.isAnonymous) {
+        await User.create(userObj);
+    } else {
+        const date = new Date();
+        date.setMinutes(date.getMinutes() + 5);
+        await User.create({ ...userObj, expireAt: date });
+    }
 };
 
 module.exports = createUserIfNotExist;

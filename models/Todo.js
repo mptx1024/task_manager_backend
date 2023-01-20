@@ -24,11 +24,16 @@ const todoSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        expireAt: {
+            type: Date,
+        },
     },
     // If you set timestamps: true, Mongoose will add two properties of type Date to your schema:
     //createdAt: a date representing when this document was created
     //updatedAt: a date representing when this document was last updated
     { timestamps: true }
 );
+
+todoSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 
 module.exports = mongoose.model('Todo', todoSchema);

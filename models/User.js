@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
-        required: true,
+        required: false,
     },
     // password
 
@@ -13,12 +13,20 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: true,
+        required: false,
     },
     photoUrl: {
         type: String,
         required: false,
     },
+    isAnonymous: {
+        type: Boolean,
+        required: true,
+    },
+    expireAt: {
+        type: Date,
+    },
 });
+userSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 
 module.exports = mongoose.model('User', userSchema);

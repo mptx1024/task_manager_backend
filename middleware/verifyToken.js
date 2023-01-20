@@ -1,7 +1,15 @@
 const admin = require('firebase-admin');
+const { format } = require('date-fns');
 const createUserIfNotExist = require('../utils/createUserIfNotExist');
+
 const verifyToken = async (req, res, next) => {
+    console.log(
+        `${format(new Date(), 'yyyyMMdd HH:mm:ss')} ${req.method} ${req.path} ${
+            req.headers.authorization ? '--has token' : '--no token'
+        }`
+    );
     let idToken;
+
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
         idToken = req.headers.authorization.split(' ')[1];
         // console.log('id token: ', idToken);
@@ -11,19 +19,18 @@ const verifyToken = async (req, res, next) => {
 
     try {
         const decoded = await admin.auth().verifyIdToken(idToken);
-
         // console.log('🚀 ~ file: verifyToken.js:14 ~ verifyToken ~ decoded', decoded);
-
         const userObject = {
-            username: decoded.name,
+            username: decoded.name || null,
             uid: decoded.uid,
-            email: decoded.email,
+            email: decoded.email || null,
+            photoUrl: decoded.picture || null,
+            isAnonymous: decoded.email ? false : true,
             // last_auth_time: decoded.auth_time,
         };
         createUserIfNotExist(userObject);
+        console.log('userObject:', userObject);
         req.user = userObject;
-        // console.log('userObject: ', userObject);
-        console.log('verified!!');
     } catch (error) {
         return res.status(403).json({ message: error.message });
     }
