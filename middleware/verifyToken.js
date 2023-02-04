@@ -19,7 +19,7 @@ const verifyToken = async (req, res, next) => {
 
     try {
         const decoded = await admin.auth().verifyIdToken(idToken);
-        // console.log('🚀 ~ file: verifyToken.js:14 ~ verifyToken ~ decoded', decoded);
+
         const userObject = {
             username: decoded.name || null,
             uid: decoded.uid,
@@ -28,8 +28,8 @@ const verifyToken = async (req, res, next) => {
             isAnonymous: decoded.email ? false : true,
             // last_auth_time: decoded.auth_time,
         };
+        console.log(`--isAnonymous: ${Boolean(decoded.email)} --uid: ${decoded.uid};`);
         createUserIfNotExist(userObject);
-        console.log('userObject:', userObject);
         req.user = userObject;
     } catch (error) {
         return res.status(403).json({ message: error.message });

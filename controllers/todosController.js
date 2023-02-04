@@ -1,4 +1,5 @@
 const Todo = require('../models/Todo');
+const ProjectModel = require('../models/Project');
 const mongoose = require('mongoose');
 
 /**
@@ -8,12 +9,10 @@ const mongoose = require('mongoose');
  */
 const getAllTodos = async (req, res) => {
     const { uid } = req.user;
-    // console.log(' in getAllTodos');
     const todos = await Todo.find({ uid: uid });
-    // console.log('🚀 ~ file: todosController.js:14 ~ getAllTodos ~ todos', todos);
 
     if (!todos?.length) {
-        return res.status(200).json({ msg: `No todos found with uid ${uid}` });
+        return res.status(404).json({ msg: `No todos found with uid ${uid}` });
     }
     res.status(200).json(todos);
 };
@@ -24,19 +23,24 @@ const getAllTodos = async (req, res) => {
  * @access Private
  */
 const createNewTodo = async (req, res) => {
-    const { isAnonymous } = req.user; // Injected from middleware verifyToken
-    const { uid, title } = req.body;
-
-    if (!uid || !title) {
-        return res.status(400).json({ msg: `No uid or title` });
+    const { isAnonymous, uid } = req.user; // Injected from middleware verifyToken
+    const { title, dueDate, projectId, priority } = req.body;
+    if (!title.trim()) {
+        return res.status(400).json({ msg: `No todo title` });
     }
+
     let newTodo;
+
     if (!isAnonymous) {
-        newTodo = await Todo.create({ uid: uid, title: title });
+        newTodo = await Todo.create({ uid, title, dueDate, projectId, priority });
     } else {
         const date = new Date();
         date.setMinutes(date.getMinutes() + 5); // 2880 mins === two days
-        newTodo = await Todo.create({ uid: uid, title: title, expireAt: date });
+        newTodo = await Todo.create({ uid, title, dueDate, projectId, priority, expireAt: date });
+    }
+
+    if (projectId && newTodo) {
+        await ProjectModel.updateOne({ _id: projectId }, { $addToSet: { todoList: newTodo._id } });
     }
 
     if (newTodo) {
@@ -53,16 +57,30 @@ const createNewTodo = async (req, res) => {
  */
 
 const updateTodo = async (req, res) => {
-    const { uid, _id: todoId, title, completed } = req.body;
+    const { _id: todoId, title, completed, projectId, dueDate, description, priority } = req.body;
+
+    if (!title) {
+        return res.status(400).json({ msg: `No todo title` });
+    }
 
     // findById(): Finds a single document by its _id field
     const todo = await Todo.findById(todoId).exec();
+
     if (!todo) {
         return res.status(400).json({ message: 'Todo not found' });
     }
 
+    if (projectId && todo.projectId !== projectId) {
+        await ProjectModel.updateOne({ _id: projectId }, { $addToSet: { todoList: newTodo._id } });
+        todo.projectId = projectId;
+    }
+
     todo.title = title;
     todo.completed = completed;
+    todo.projectId = projectId;
+    todo.dueDate = dueDate;
+    todo.description = description;
+    todo.priority = priority;
     const updatedTodo = await todo.save();
 
     return res.status(200).json({ msg: `Todo updated. id: ${updatedTodo._id}` });

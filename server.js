@@ -34,6 +34,7 @@ const defaultApp = admin.initializeApp({
 
 // Only check token for specific route:
 app.use('/api/v1/todos', verifyToken, require('./routes/todoRoutes'));
+app.use('/api/v1/projects', verifyToken, require('./routes/projectRoutes'));
 
 // catch-all for 404 not found
 app.all('*', (req, res) => {
