@@ -33,8 +33,24 @@ const defaultApp = admin.initializeApp({
 // app.use(verifyToken)
 
 // Only check token for specific route:
-app.use('/api/v1/todos', verifyToken, require('./routes/todoRoutes'));
-app.use('/api/v1/projects', verifyToken, require('./routes/projectRoutes'));
+
+app.use(verifyToken);
+app.use(
+    '/api/v1/todos',
+    require('./routes/todoRoutes')
+    // (err, req, res, next) => {
+    //     console.error(err.stack);
+    //     res.status(500).send('Something broke!');
+    // }
+);
+app.use(
+    '/api/v1/projects',
+    require('./routes/projectRoutes')
+    //  (err, req, res, next) => {
+    //     console.error(err.stack);
+    //     res.status(500).send('Something broke!');
+    // }
+);
 
 // catch-all for 404 not found
 app.all('*', (req, res) => {
