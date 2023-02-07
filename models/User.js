@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const insertTemplateData = require('../utils/insertTemplateData');
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -30,5 +31,11 @@ const userSchema = new mongoose.Schema({
     },
 });
 userSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
+
+// userSchema.post('save', function (doc, next) {
+//     console.log('%s has been saved', doc);
+//     insertTemplateData(this.uid, this.isAnonymous);
+//     next();
+// });
 
 module.exports = mongoose.model('User', userSchema);

@@ -1,5 +1,5 @@
 const Todo = require('../models/Todo');
-const ProjectModel = require('../models/Project');
+const Project = require('../models/Project');
 const mongoose = require('mongoose');
 
 /**
@@ -7,9 +7,12 @@ const mongoose = require('mongoose');
  * @route GET /api/v1/todos
  * @access Private
  */
+
 const getAllTodos = async (req, res) => {
-    const { uid } = req.user;
+    const { uid, isNewUser } = req.user;
+
     const todos = await Todo.find({ uid: uid });
+    // console.log('🚀 ~ file: todosController.js:17 ~ getAllTodos ~ todos', todos);
 
     if (!todos?.length) {
         return res.status(404).json({ msg: `No todos found with uid ${uid}` });
@@ -25,6 +28,7 @@ const getAllTodos = async (req, res) => {
 const createNewTodo = async (req, res) => {
     const { isAnonymous, uid } = req.user; // Injected from middleware verifyToken
     const { title, dueDate, projectId, priority } = req.body;
+
     if (!title.trim()) {
         return res.status(400).json({ msg: `No todo title` });
     }
@@ -39,8 +43,8 @@ const createNewTodo = async (req, res) => {
         newTodo = await Todo.create({ uid, title, dueDate, projectId, priority, expireAt: date });
     }
 
-    if (projectId && newTodo) {
-        await ProjectModel.updateOne({ _id: projectId }, { $addToSet: { todoList: newTodo._id } });
+    if (projectId) {
+        await Project.updateOne({ _id: projectId }, { $addToSet: { todoList: newTodo._id } });
     }
 
     if (newTodo) {
@@ -71,7 +75,7 @@ const updateTodo = async (req, res) => {
     }
 
     if (projectId && todo.projectId !== projectId) {
-        await ProjectModel.updateOne({ _id: projectId }, { $addToSet: { todoList: newTodo._id } });
+        await Project.updateOne({ _id: projectId }, { $addToSet: { todoList: todo._id } });
         todo.projectId = projectId;
     }
 
@@ -104,6 +108,16 @@ const deleteTodo = async (req, res) => {
     if (!todo) {
         return res.status(400).json({ msg: 'Todo not found' });
     }
+
+    if (todo.projectId) {
+        // Remove todo reference in project's todoList
+        const project = await Project.findById(todo.projectId).exec();
+        const updatedProjectTodoList = project?.todoList.filter((todoId) => {
+            if (!todoId.equals(todo._id)) return todoId;
+        });
+        await Project.updateOne({ _id: todo.projectId }, { $set: { todoList: updatedProjectTodoList } });
+    }
+
     const result = await todo.deleteOne();
     res.json({ msg: `Todo with ID ${result._id} has been deleted` });
 };

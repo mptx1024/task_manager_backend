@@ -1,10 +1,12 @@
 const admin = require('firebase-admin');
+
 const { format } = require('date-fns');
-const createUserIfNotExist = require('../utils/createUserIfNotExist');
+const createNewUser = require('../utils/createNewUser');
+const User = require('../models/User');
 
 const verifyToken = async (req, res, next) => {
     console.log(
-        `${format(new Date(), 'yyyyMMdd HH:mm:ss')} ${req.method} ${req.path} ${
+        `${format(new Date(), 'yyyyMMdd HH:mm:ss')} ${req.method} ${req.originalUrl} ${
             req.headers.authorization ? '--has token' : '--no token'
         }`
     );
@@ -17,23 +19,28 @@ const verifyToken = async (req, res, next) => {
         return res.status(401).json({ message: ' Unauthorized' });
     }
 
-    try {
-        const decoded = await admin.auth().verifyIdToken(idToken);
+    // try {
+    const decoded = await admin.auth().verifyIdToken(idToken);
+    const isUserExist = await User.findOne({ uid: decoded.uid });
 
-        const userObject = {
-            username: decoded.name || null,
-            uid: decoded.uid,
-            email: decoded.email || null,
-            photoUrl: decoded.picture || null,
-            isAnonymous: decoded.email ? false : true,
-            // last_auth_time: decoded.auth_time,
-        };
-        console.log(`--isAnonymous: ${Boolean(decoded.email)} --uid: ${decoded.uid};`);
-        createUserIfNotExist(userObject);
-        req.user = userObject;
-    } catch (error) {
-        return res.status(403).json({ message: error.message });
+    const userObject = {
+        username: decoded.name || null,
+        uid: decoded.uid,
+        email: decoded.email || null,
+        photoUrl: decoded.picture || null,
+        // isAnonymous: decoded.email ? false : true,
+        isAnonymous: true,
+        isNewUser: isUserExist ? false : true,
+        // last_auth_time: decoded.auth_time,
+    };
+    if (!isUserExist) {
+        console.log(`New User!!! url: ${req.originalUrl} ${decoded.uid}`);
+        await createNewUser(userObject);
     }
+    req.user = userObject;
+    // } catch (error) {
+    //     return res.status(403).json({ message: error.message });
+    // }
     next();
 };
 

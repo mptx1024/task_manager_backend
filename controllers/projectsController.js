@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 const getAllProjects = async (req, res) => {
     const { uid } = req.user;
     const projects = await Project.find({ uid: uid });
+    // console.log('🚀 ~ file: projectsController.js:12 ~ getAllProjects ~ projects', projects);
 
     if (!projects?.length) {
         return res.status(404).json({ msg: `No projects found with uid ${uid}` });
@@ -87,7 +88,6 @@ const deleteProject = async (req, res) => {
     if (!project) {
         return res.status(400).json({ msg: 'Project not found' });
     }
-
     const result = await project.deleteOne();
     res.json({ msg: `Project with ID ${result._id} has been deleted` });
 };

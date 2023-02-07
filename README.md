@@ -19,3 +19,6 @@
 // .catch((error) => {
 // console.log('Error creating new user:', error);
 // });
+
+# simulated google account mongoDB document:
+{"_id":{"$oid":"63d34d061ce589f594bea8e4"},"username":"Chicken Peach","uid":"6TYE4HvD773CNltosypgCB7FH1Ye","email":"chicken.peach.388@example.com","photoUrl":"https://randomuser.me/api/portraits/women/77.jpg","isAnonymous":false,"__v":{"$numberInt":"0"}}
