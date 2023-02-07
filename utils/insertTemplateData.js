@@ -6,17 +6,20 @@ const insertTemplateData = async (uid, isAnonymous) => {
     let studyProjectId;
     let workProjectId;
 
+    //https://stackoverflow.com/questions/54714148/mongoose-update-or-insert-many-documents
+    //https://www.mongodb.com/docs/manual/reference/method/db.collection.bulkWrite/
+    // Try bulkWrite()
     const projects = await Project.insertMany([
         {
             uid: uid,
             title: 'Study',
             expireAt: isAnonymous ? expireTime() : null,
         },
-        // {
-        //     uid: uid,
-        //     title: 'Home',
-        //     expireAt: isAnonymous ? expireTime() : null,
-        // },
+        {
+            uid: uid,
+            title: 'Home',
+            expireAt: isAnonymous ? expireTime() : null,
+        },
     ]);
 
     for (const project of projects) {
@@ -26,8 +29,6 @@ const insertTemplateData = async (uid, isAnonymous) => {
             workProjectId = project._id;
         }
     }
-    console.log('🚀 ~ file: insertTemplateData.js:28 ~ insertTemplateData ~ studyProjectId', studyProjectId);
-
     const todos = await Todo.insertMany([
         {
             uid: uid,
@@ -37,14 +38,14 @@ const insertTemplateData = async (uid, isAnonymous) => {
             priority: true,
             expireAt: isAnonymous ? expireTime() : null,
         },
-        // {
-        //     uid: uid,
-        //     title: 'Learn redux RTK query',
-        //     dueDate: new Date(),
-        //     projectId: studyProjectId,
-        //     priority: true,
-        //     expireAt: isAnonymous ? expireTime() : null,
-        // },
+        {
+            uid: uid,
+            title: 'Learn redux RTK query',
+            dueDate: new Date(),
+            projectId: studyProjectId,
+            priority: true,
+            expireAt: isAnonymous ? expireTime() : null,
+        },
     ]);
 
     return;

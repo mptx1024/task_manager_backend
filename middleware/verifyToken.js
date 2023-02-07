@@ -19,7 +19,6 @@ const verifyToken = async (req, res, next) => {
         return res.status(401).json({ message: ' Unauthorized' });
     }
 
-    
     // await new Promise((resolve) => setTimeout(resolve, 2000));
     const decoded = await admin.auth().verifyIdToken(idToken);
     const isUserExist = await User.findOne({ uid: decoded.uid }).lean().exec();
@@ -29,8 +28,8 @@ const verifyToken = async (req, res, next) => {
         uid: decoded.uid,
         email: decoded.email || null,
         photoUrl: decoded.picture || null,
-        // isAnonymous: decoded.email ? false : true,
-        isAnonymous: true,
+        isAnonymous: decoded.email ? false : true,
+        // isAnonymous: true,
         // isNewUser: isUserExist ? false : true,
     };
     // console.log('🚀 ~ file: verifyToken.js:36 ~ verifyToken ~ uid', userObject.uid);
