@@ -18,9 +18,13 @@ const verifyToken = async (req, res, next) => {
     } else {
         return res.status(401).json({ message: ' Unauthorized' });
     }
-
-    // await new Promise((resolve) => setTimeout(resolve, 2000));
-    const decoded = await admin.auth().verifyIdToken(idToken);
+    let decoded;
+    try {
+        decoded = await admin.auth().verifyIdToken(idToken);
+    } catch (error) {
+        console.error(error.message);
+        return res.status(401).json({ message: ' Unauthorized. The Firebase ID token has been revoked' });
+    }
     const isUserExist = await User.findOne({ uid: decoded.uid }).lean().exec();
 
     const userObject = {
@@ -32,7 +36,6 @@ const verifyToken = async (req, res, next) => {
         // isAnonymous: true,
         // isNewUser: isUserExist ? false : true,
     };
-    // console.log('🚀 ~ file: verifyToken.js:36 ~ verifyToken ~ uid', userObject.uid);
 
     if (!isUserExist) {
         console.log(`New User!!! url: ${req.originalUrl} ${decoded.uid}`);

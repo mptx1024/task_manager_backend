@@ -15,7 +15,8 @@ connectDB();
 app.use(express.json());
 app.use(cors());
 
-const useEmulator = true;
+const useEmulator = process.env.NODE_ENV === 'production' ? false : true;
+
 if (useEmulator) {
     process.env['FIREBASE_AUTH_EMULATOR_HOST'] = '127.0.0.1:9099';
 }
@@ -29,28 +30,10 @@ const defaultApp = admin.initializeApp({
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
     }),
 });
-// Put middleware before any routes to check token
-// app.use(verifyToken)
-
-// Only check token for specific route:
 
 app.use(verifyToken);
-app.use(
-    '/api/v1/todos',
-    require('./routes/todoRoutes')
-    // (err, req, res, next) => {
-    //     console.error(err.stack);
-    //     res.status(500).send('Something broke!');
-    // }
-);
-app.use(
-    '/api/v1/projects',
-    require('./routes/projectRoutes')
-    //  (err, req, res, next) => {
-    //     console.error(err.stack);
-    //     res.status(500).send('Something broke!');
-    // }
-);
+app.use('/api/v1/todos', require('./routes/todoRoutes'));
+app.use('/api/v1/projects', require('./routes/projectRoutes'));
 
 // catch-all for 404 not found
 app.all('*', (req, res) => {

@@ -1,6 +1,7 @@
 const Todo = require('../models/Todo');
 const Project = require('../models/Project');
 const mongoose = require('mongoose');
+const expireTime = require('../config/anonymousDataExpireTime');
 
 /**
  * @description Get all todos from a user
@@ -33,15 +34,14 @@ const createNewTodo = async (req, res) => {
         return res.status(400).json({ msg: `No todo title` });
     }
 
-    let newTodo;
-
-    if (!isAnonymous) {
-        newTodo = await Todo.create({ uid, title, dueDate, projectId, priority });
-    } else {
-        const date = new Date();
-        date.setMinutes(date.getMinutes() + 5); // 2880 mins === two days
-        newTodo = await Todo.create({ uid, title, dueDate, projectId, priority, expireAt: date });
-    }
+    let newTodo = await Todo.create({
+        uid,
+        title,
+        dueDate,
+        projectId,
+        priority,
+        expireAt: isAnonymous ? expireTime() : null,
+    });
 
     if (projectId) {
         await Project.updateOne({ _id: projectId }, { $addToSet: { todoList: newTodo._id } });

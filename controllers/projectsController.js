@@ -1,6 +1,6 @@
 const Project = require('../models/Project');
 const mongoose = require('mongoose');
-
+const expireTime = require('../config/anonymousDataExpireTime');
 /**
  * @description Get all projects from a user
  * @route GET /api/v1/projects
@@ -31,14 +31,7 @@ const createNewProject = async (req, res) => {
         return res.status(400).json({ msg: `No project title` });
     }
 
-    let newProject;
-    if (!isAnonymous) {
-        newProject = await Project.create({ uid, title });
-    } else {
-        const date = new Date();
-        date.setMinutes(date.getMinutes() + 5); // 2880 mins === two days
-        newProject = await Project.create({ uid, title, expireAt: date });
-    }
+    const newProject = await Project.create({ uid, title, expireAt: isAnonymous ? expireTime() : null });
 
     if (newProject) {
         return res.status(201).json({ msg: 'New Project has been created' });
