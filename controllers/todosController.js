@@ -16,7 +16,7 @@ const getAllTodos = async (req, res) => {
     // console.log('🚀 ~ file: todosController.js:17 ~ getAllTodos ~ todos', todos);
 
     if (!todos?.length) {
-        return res.status(404).json({ msg: `No todos found with uid ${uid}` });
+        return res.status(204).json({ msg: `No todos found with uid ${uid}` });
     }
     res.status(200).json(todos);
 };

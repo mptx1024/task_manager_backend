@@ -16,6 +16,7 @@ app.use(express.json());
 app.use(cors());
 
 const useEmulator = process.env.NODE_ENV === 'production' ? false : true;
+console.log('🚀 ~ file: server.js:19 ~ useEmulator', useEmulator);
 // const useEmulator = false;
 
 if (useEmulator) {
