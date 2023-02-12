@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const insertTemplateData = require('../utils/insertTemplateData');
+const insertTemplateData = require('../utils/injectSampleData');
 
 const userSchema = new mongoose.Schema(
     {

@@ -1,5 +1,5 @@
 require('dotenv').config();
-require('express-async-error');
+require('express-async-errors');
 const express = require('express');
 const mongoose = require('mongoose');
 const admin = require('firebase-admin');
@@ -7,7 +7,7 @@ const cors = require('cors');
 const errorHandler = require('./middleware/errorHandler');
 const verifyToken = require('./middleware/verifyToken');
 const connectDB = require('./config/dbConnection');
-
+const login = require('./controllers/authController');
 const PORT = process.env.PORT || 3500;
 
 const app = express();
@@ -16,14 +16,13 @@ app.use(express.json());
 app.use(cors());
 
 const useEmulator = process.env.NODE_ENV === 'production' ? false : true;
-console.log('🚀 ~ file: server.js:19 ~ useEmulator', useEmulator);
 // const useEmulator = false;
 
 if (useEmulator) {
     process.env['FIREBASE_AUTH_EMULATOR_HOST'] = '127.0.0.1:9099';
 }
 
-const defaultApp = admin.initializeApp({
+admin.initializeApp({
     credential: admin.credential.cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
         privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
@@ -31,9 +30,10 @@ const defaultApp = admin.initializeApp({
     }),
 });
 
-app.use(verifyToken);
-app.use('/api/v1/todos', require('./routes/todoRoutes'));
-app.use('/api/v1/projects', require('./routes/projectRoutes'));
+app.get('/api/v1/auth', verifyToken, login);
+
+app.use('/api/v1/todos', verifyToken, require('./routes/todoRoutes'));
+app.use('/api/v1/projects', verifyToken, require('./routes/projectRoutes'));
 
 // catch-all for 404 not found
 app.all('*', (req, res) => {

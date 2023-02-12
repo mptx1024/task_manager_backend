@@ -12,6 +12,8 @@ const getAllProjects = async (req, res) => {
     // console.log('🚀 ~ file: projectsController.js:12 ~ getAllProjects ~ projects', projects);
 
     if (!projects?.length) {
+        console.log('in projectsController: No todo found');
+
         return res.status(204).json({ msg: `No projects found with uid ${uid}` });
     }
     res.status(200).json(projects);
