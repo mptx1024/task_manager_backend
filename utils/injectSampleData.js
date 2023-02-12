@@ -2,13 +2,13 @@ const Project = require('../models/Project');
 const Todo = require('../models/Todo');
 const expireTime = require('../config/anonymousDataExpireTime');
 
-const insertTemplateData = async (uid, isAnonymous) => {
+const injectSampleData = async (uid, isAnonymous) => {
     let studyProjectId;
     let workProjectId;
-
     //https://stackoverflow.com/questions/54714148/mongoose-update-or-insert-many-documents
     //https://www.mongodb.com/docs/manual/reference/method/db.collection.bulkWrite/
     // Try bulkWrite()
+
     const projects = await Project.insertMany([
         {
             uid: uid,
@@ -29,10 +29,10 @@ const insertTemplateData = async (uid, isAnonymous) => {
             workProjectId = project._id;
         }
     }
-    const todos = await Todo.insertMany([
+    await Todo.insertMany([
         {
             uid: uid,
-            title: 'Research separation of concern',
+            title: 'Sample task 1',
             dueDate: new Date(),
             projectId: studyProjectId,
             priority: true,
@@ -40,15 +40,15 @@ const insertTemplateData = async (uid, isAnonymous) => {
         },
         {
             uid: uid,
-            title: 'Learn redux RTK query',
+            title: 'Sample task 2',
             dueDate: new Date(),
             projectId: studyProjectId,
             priority: true,
             expireAt: isAnonymous ? expireTime() : null,
         },
     ]);
-
+    console.log('finished injecting??');
     return;
 };
 
-module.exports = insertTemplateData;
+module.exports = injectSampleData;
