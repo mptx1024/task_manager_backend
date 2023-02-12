@@ -9,7 +9,6 @@ const injectSampleData = async (uid, isAnonymous) => {
     //https://www.mongodb.com/docs/manual/reference/method/db.collection.bulkWrite/
     // Try bulkWrite()
 
-    
     const projects = await Project.insertMany([
         {
             uid: uid,
@@ -48,6 +47,8 @@ const injectSampleData = async (uid, isAnonymous) => {
             expireAt: isAnonymous ? expireTime() : null,
         },
     ]);
+    console.log('finished injecting??');
+    return;
 };
 
 module.exports = injectSampleData;

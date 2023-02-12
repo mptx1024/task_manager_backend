@@ -15,13 +15,12 @@ const login = async (req, res) => {
     }
 
     console.log(`New User! url: ${req.originalUrl} ${userObject.uid}`);
+
     const newUser = await createNewUser(userObject);
-    if (newUser) {
-        await injectSampleData(newUser.uid, newUser.isAnonymous);
 
-    }
-
-    res.status(200).json({ msg: `New user with UID ${userObject.uid} created` });
+    await injectSampleData(newUser.uid, newUser.isAnonymous);
+    console.log('before sending response');
+    res.status(200).json({ msg: `New user with UID ${newUser.uid} created` });
 };
 
 module.exports = login;

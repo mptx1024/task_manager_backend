@@ -26,7 +26,7 @@ const verifyToken = async (req, res, next) => {
         console.error(error.message);
         return res.status(401).json({ message: ' Unauthorized. The Firebase ID token has been revoked' });
     }
-    console.log('🚀 ~ file: verifyToken.js:42 ~ verifyToken ~ decoded', decoded.email);
+    console.log('🚀 ~ file: verifyToken.js:29 ~ verifyToken ~ decoded; uid: ', decoded.uid, 'email: ', decoded.email);
     const userObject = {
         username: decoded.name || null,
         uid: decoded.uid,
