@@ -10,7 +10,7 @@ const expireTime = require('../config/anonymousDataExpireTime');
  */
 
 const getAllTodos = async (req, res) => {
-    const { uid, isNewUser } = req.user;
+    const { uid } = req.user;
 
     const todos = await Todo.find({ uid: uid });
     // console.log('🚀 ~ file: todosController.js:17 ~ getAllTodos ~ todos', todos);
@@ -20,6 +20,22 @@ const getAllTodos = async (req, res) => {
         return res.status(204).json({ msg: `No todos found with uid ${uid}` });
     }
     res.status(200).json(todos);
+};
+
+/**
+ * @description Get one todo
+ * @route GET /api/v1/todos/:id
+ * @access Private
+ */
+
+const getTodo = async (req, res) => {
+    const {
+        user: { uid },
+        params: { id: todoId },
+    } = req;
+
+    const todo = await Todo.findOne({ uid: uid, _id: todoId });
+    res.status(200).json(todo);
 };
 
 /**
@@ -35,7 +51,7 @@ const createNewTodo = async (req, res) => {
         return res.status(400).json({ msg: `No todo title` });
     }
 
-    let newTodo = await Todo.create({
+    const newTodo = await Todo.create({
         uid,
         title,
         dueDate,
@@ -47,12 +63,13 @@ const createNewTodo = async (req, res) => {
     if (projectId) {
         await Project.updateOne({ _id: projectId }, { $addToSet: { todoList: newTodo._id } });
     }
+    return res.status(201).json({ msg: 'New todo has been created' });
 
-    if (newTodo) {
-        return res.status(201).json({ msg: 'New todo has been created' });
-    } else {
-        return res.status(400).json({ msg: 'Invalid todo data' });
-    }
+    // if (newTodo) {
+    //     return res.status(201).json({ msg: 'New todo has been created' });
+    // } else {
+    //     return res.status(400).json({ msg: 'Invalid todo data' });
+    // }
 };
 
 /**
@@ -62,33 +79,42 @@ const createNewTodo = async (req, res) => {
  */
 
 const updateTodo = async (req, res) => {
-    const { _id: todoId, title, completed, projectId, dueDate, description, priority } = req.body;
+    const {
+        body: { title, completed, projectId, dueDate, description, priority },
+        user: { uid },
+        params: { id: todoId },
+    } = req;
 
+    console.log('🚀 ~ file: todosController.js:86 ~ updateTodo ~ todoId', todoId);
     if (!title) {
         return res.status(400).json({ msg: `No todo title` });
     }
+    if (!uid) {
+        return res.status(400).json({ msg: `No uid` });
+    }
 
     // findById(): Finds a single document by its _id field
-    const todo = await Todo.findById(todoId).exec();
+    // const todo = await Todo.findById(todoId).exec();
+    const todo = await Todo.findByIdAndUpdate({ _id: todoId, uid: uid }, req.body, { new: true, runValidators: true });
 
     if (!todo) {
         return res.status(400).json({ message: 'Todo not found' });
     }
 
     if (projectId && todo.projectId !== projectId) {
-        await Project.updateOne({ _id: projectId }, { $addToSet: { todoList: todo._id } });
+        await Project.updateOne({ _id: projectId, uid: uid }, { $addToSet: { todoList: todo._id } });
         todo.projectId = projectId;
     }
 
-    todo.title = title;
-    todo.completed = completed;
-    todo.projectId = projectId;
-    todo.dueDate = dueDate;
-    todo.description = description;
-    todo.priority = priority;
-    const updatedTodo = await todo.save();
+    // todo.title = title;
+    // todo.completed = completed;
+    // todo.projectId = projectId;
+    // todo.dueDate = dueDate;
+    // todo.description = description;
+    // todo.priority = priority;
+    // const updatedTodo = await todo.save();
 
-    return res.status(200).json({ msg: `Todo updated. id: ${updatedTodo._id}` });
+    return res.status(200).json({ msg: `Todo updated. id: ${todo._id}` });
     // return res.status(200).json({ msg: `Todo updated` });
 };
 
@@ -99,33 +125,42 @@ const updateTodo = async (req, res) => {
  */
 
 const deleteTodo = async (req, res) => {
-    const { _id: todoId } = req.body;
-    // console.log('🚀 ~ file: todosController.js:72 ~ deleteTodo ~ req.body', req.body);
+    const {
+        user: { uid },
+        params: { id: todoId },
+    } = req;
 
     if (!todoId) {
         return res.status(400).json({ msg: 'TodoId required' });
     }
-    const todo = await Todo.findById(todoId).exec();
-    if (!todo) {
+    if (!uid) {
+        return res.status(400).json({ msg: `No uid` });
+    }
+    // const todo = await Todo.findById(todoId).exec();
+    const deletedTodo = await Todo.findByIdAndDelete({ _id: todoId, uid: uid });
+
+    if (!deletedTodo) {
         return res.status(400).json({ msg: 'Todo not found' });
     }
 
-    if (todo.projectId) {
-        // Remove todo reference in project's todoList
-        const project = await Project.findById(todo.projectId).exec();
-        const updatedProjectTodoList = project?.todoList.filter((todoId) => {
-            if (!todoId.equals(todo._id)) return todoId;
-        });
-        await Project.updateOne({ _id: todo.projectId }, { $set: { todoList: updatedProjectTodoList } });
-    }
+    // Remove todo reference in project's todoList
 
-    const result = await todo.deleteOne();
-    res.json({ msg: `Todo with ID ${result._id} has been deleted` });
+    // if (todo.projectId) {
+    //     const project = await Project.findById(todo.projectId).exec();
+    //     const updatedProjectTodoList = project?.todoList.filter((todoId) => {
+    //         if (!todoId.equals(todo._id)) return todoId;
+    //     });
+    //     await Project.updateOne({ _id: todo.projectId }, { $set: { todoList: updatedProjectTodoList } });
+    // }
+
+    // const result = await todo.deleteOne();
+    res.status(200).json({ msg: `Todo has been deleted` });
 };
 
 module.exports = {
     createNewTodo,
     getAllTodos,
+    getTodo,
     updateTodo,
     deleteTodo,
 };

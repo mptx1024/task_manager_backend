@@ -8,6 +8,8 @@ const errorHandler = require('./middleware/errorHandler');
 const verifyToken = require('./middleware/verifyToken');
 const connectDB = require('./config/dbConnection');
 const login = require('./controllers/authController');
+const todoRouter = require('./routes/todoRoutes');
+const projectRouter = require('./routes/projectRoutes');
 const PORT = process.env.PORT || 3500;
 
 const app = express();
@@ -32,8 +34,8 @@ admin.initializeApp({
 
 app.get('/api/v1/auth', verifyToken, login);
 
-app.use('/api/v1/todos', verifyToken, require('./routes/todoRoutes'));
-app.use('/api/v1/projects', verifyToken, require('./routes/projectRoutes'));
+app.use('/api/v1/todos', verifyToken, todoRouter);
+app.use('/api/v1/projects', verifyToken, projectRouter);
 
 // catch-all for 404 not found
 app.all('*', (req, res) => {

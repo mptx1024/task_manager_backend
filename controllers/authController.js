@@ -19,7 +19,6 @@ const login = async (req, res) => {
     const newUser = await createNewUser(userObject);
 
     await injectSampleData(newUser.uid, newUser.isAnonymous);
-    console.log('before sending response');
     res.status(200).json({ msg: `New user with UID ${newUser.uid} created` });
 };
 

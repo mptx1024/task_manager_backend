@@ -47,7 +47,7 @@ const injectSampleData = async (uid, isAnonymous) => {
             expireAt: isAnonymous ? expireTime() : null,
         },
     ]);
-    console.log('finished injecting??');
+    // console.log('finished injecting??');
     return;
 };
 
