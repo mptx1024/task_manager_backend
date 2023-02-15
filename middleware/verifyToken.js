@@ -14,7 +14,6 @@ const verifyToken = async (req, res, next) => {
 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
         idToken = req.headers.authorization.split(' ')[1];
-        // console.log('id token: ', idToken);
     } else {
         return res.status(401).json({ message: ' Unauthorized' });
     }
@@ -26,7 +25,7 @@ const verifyToken = async (req, res, next) => {
         console.error(error.message);
         return res.status(401).json({ message: ' Unauthorized. The Firebase ID token has been revoked' });
     }
-    console.log('🚀 ~ file: verifyToken.js:29 ~ verifyToken ~ decoded; uid: ', decoded.uid, 'email: ', decoded.email);
+    console.log('uid: ', decoded.uid, 'email: ', decoded.email);
     const userObject = {
         username: decoded.name || null,
         uid: decoded.uid,

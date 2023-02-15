@@ -9,14 +9,6 @@ const todoSchema = new mongoose.Schema(
             ref: 'User',
         },
 
-        // alternatively, use mongoose generated _id as userId
-        /*  mongoose.Schema.ObjectId and mongoose.Schema.Types.ObjectId refer to the exact same thing. */
-        // userId: {
-        //     type: mongoose.Schema.Types.ObjectId,
-        //     required: [true, 'Please provide user'],
-        //     ref: 'User',
-        // },
-
         title: {
             type: String,
             required: [true, 'Title not provided'],

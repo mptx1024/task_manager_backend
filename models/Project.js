@@ -23,6 +23,7 @@ const projectSchema = new mongoose.Schema(
 );
 projectSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 
+// Delete all Todos belonging to current the project document
 //https://stackoverflow.com/questions/11904159/automatically-remove-referencing-objects-on-deletion-in-mongodb
 projectSchema.pre('deleteOne', { document: true }, function (next) {
     // const projectId = this.getQuery()['_id'];
@@ -32,7 +33,6 @@ projectSchema.pre('deleteOne', { document: true }, function (next) {
             console.log(`[error] ${err}`);
             next(err);
         } else {
-            // console.log('success in deleting all project referenced todos');
             next();
         }
     });

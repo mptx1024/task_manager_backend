@@ -32,7 +32,9 @@ const getProject = async (req, res) => {
         user: { uid },
         params: { id: projectId },
     } = req;
-
+    console.log(`uid: `, uid);
+    console.log(`projectId:`, projectId);
+    
     const project = await Project.findOne({ uid: uid, _id: projectId });
     res.status(200).json(project);
 };

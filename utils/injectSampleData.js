@@ -17,7 +17,7 @@ const injectSampleData = async (uid, isAnonymous) => {
         },
         {
             uid: uid,
-            title: 'Home',
+            title: 'Work',
             expireAt: isAnonymous ? expireTime() : null,
         },
     ]);
@@ -25,30 +25,60 @@ const injectSampleData = async (uid, isAnonymous) => {
     for (const project of projects) {
         if (project.title === 'Study') {
             studyProjectId = project._id;
-        } else if (project.title === 'Home') {
+        } else if (project.title === 'Work') {
             workProjectId = project._id;
         }
     }
+    const today = new Date();
+
     await Todo.insertMany([
         {
             uid: uid,
             title: 'Sample task 1',
-            dueDate: new Date(),
+            dueDate: today,
             projectId: studyProjectId,
-            priority: true,
+            priority: false,
+            expireAt: isAnonymous ? expireTime() : null,
+        },
+
+        {
+            uid: uid,
+            title: 'Sample task 2',
+            dueDate: null,
+            projectId: null,
+            priority: false,
+            completed: false,
             expireAt: isAnonymous ? expireTime() : null,
         },
         {
             uid: uid,
-            title: 'Sample task 2',
-            dueDate: new Date(),
+            title: 'Sample task 3',
+            dueDate: new Date(today.getTime() - 86400000 * 2),
+            projectId: workProjectId,
+            priority: false,
+            completed: false,
+            expireAt: isAnonymous ? expireTime() : null,
+        },
+        {
+            uid: uid,
+            title: 'Sample task 4',
+            dueDate: today,
             projectId: studyProjectId,
-            priority: true,
+            priority: false,
+            completed: true,
+            expireAt: isAnonymous ? expireTime() : null,
+        },
+        {
+            uid: uid,
+            title: 'Sample task 5',
+            dueDate: new Date(today.getTime() - 86400000 * 3),
+            projectId: workProjectId,
+            priority: false,
+            completed: true,
             expireAt: isAnonymous ? expireTime() : null,
         },
     ]);
-    // console.log('finished injecting??');
-    return;
+    // return;
 };
 
 module.exports = injectSampleData;

@@ -63,7 +63,7 @@ const createNewTodo = async (req, res) => {
     if (projectId) {
         await Project.updateOne({ _id: projectId }, { $addToSet: { todoList: newTodo._id } });
     }
-    return res.status(201).json({ msg: 'New todo has been created' });
+    return res.status(201).json(newTodo);
 
     // if (newTodo) {
     //     return res.status(201).json({ msg: 'New todo has been created' });
@@ -85,7 +85,6 @@ const updateTodo = async (req, res) => {
         params: { id: todoId },
     } = req;
 
-    console.log('🚀 ~ file: todosController.js:86 ~ updateTodo ~ todoId', todoId);
     if (!title) {
         return res.status(400).json({ msg: `No todo title` });
     }
@@ -114,7 +113,8 @@ const updateTodo = async (req, res) => {
     // todo.priority = priority;
     // const updatedTodo = await todo.save();
 
-    return res.status(200).json({ msg: `Todo updated. id: ${todo._id}` });
+    // return res.status(200).json({ msg: `Todo updated. id: ${todo._id}` });
+    return res.status(200).json({ todo });
     // return res.status(200).json({ msg: `Todo updated` });
 };
 
