@@ -7,7 +7,6 @@ const injectSampleData = async (uid, isAnonymous) => {
     let workProjectId;
     //https://stackoverflow.com/questions/54714148/mongoose-update-or-insert-many-documents
     //https://www.mongodb.com/docs/manual/reference/method/db.collection.bulkWrite/
-    // Try bulkWrite()
 
     const projects = await Project.insertMany([
         {

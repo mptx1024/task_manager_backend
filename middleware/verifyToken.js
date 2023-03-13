@@ -5,11 +5,11 @@ const createNewUser = require('../utils/createNewUser');
 const User = require('../models/User');
 
 const verifyToken = async (req, res, next) => {
-    console.log(
-        `${format(new Date(), 'yyyyMMdd HH:mm:ss')} ${req.method} ${req.originalUrl} ${
-            req.headers.authorization ? '--has token' : '--no token'
-        }`
-    );
+    // console.log(
+    //     `${format(new Date(), 'yyyyMMdd HH:mm:ss')} ${req.method} ${req.originalUrl} ${
+    //         req.headers.authorization ? '--has token' : '--no token'
+    //     }`
+    // );
     let idToken;
 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
@@ -25,7 +25,7 @@ const verifyToken = async (req, res, next) => {
         console.error(error.message);
         return res.status(401).json({ message: ' Unauthorized. The Firebase ID token has been revoked' });
     }
-    console.log('uid: ', decoded.uid, 'email: ', decoded.email);
+    // console.log('uid: ', decoded.uid, 'email: ', decoded.email);
     const userObject = {
         username: decoded.name || null,
         uid: decoded.uid,

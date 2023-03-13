@@ -17,12 +17,11 @@ connectDB();
 app.use(express.json());
 app.use(cors());
 
-const useEmulator = process.env.NODE_ENV === 'production' ? false : true;
-// const useEmulator = false;
+// const useEmulator = process.env.NODE_ENV === 'production' ? false : true;
+// if (useEmulator) {
+//     process.env['FIREBASE_AUTH_EMULATOR_HOST'] = '127.0.0.1:9099';
+// }
 
-if (useEmulator) {
-    process.env['FIREBASE_AUTH_EMULATOR_HOST'] = '127.0.0.1:9099';
-}
 
 admin.initializeApp({
     credential: admin.credential.cert({
@@ -33,11 +32,9 @@ admin.initializeApp({
 });
 
 app.get('/api/v1/auth', verifyToken, login);
-
 app.use('/api/v1/todos', verifyToken, todoRouter);
 app.use('/api/v1/projects', verifyToken, projectRouter);
 
-// catch-all for 404 not found
 app.all('*', (req, res) => {
     res.status(404).json({ msg: '404 Not Found' });
 });
