@@ -1,6 +1,6 @@
 # MERN Task Manager built with React, Redux RTK Query, MUI 5, Nodejs and Firebase Auth
 
-## _This is the backend repo of MERN Task Manager. For frontend repo please [click here](https://github.com/fjiasigmoid/task_manager_frontend)_
+## _This is the backend repo. For frontend repo please [click here](https://github.com/fjiasigmoid/task_manager_frontend)_
 
 ### Web
 
@@ -21,7 +21,7 @@
 -   Filter by Priority, Date, Projects, and Overdue
 -   Solcial and anonymous login
 
-## Technology Highlights
+## Highlights
 
 -   ### Frontend
 
@@ -32,22 +32,22 @@
         -   Optimize data fetching and reduce unnecessary network requests
     -   Persistent login
         -   Restore app state & data after refreshing pages
-    -   Integrate with Firebase auth
-        -   Social and anonyous login with [Firebase Auth](https://firebase.google.com/products/auth) solution
+    -   Integrate with [Firebase Auth](https://firebase.google.com/products/auth)
+        -   Social and anonyous login
     -   Dark mode with [MUI v5](https://mui.com/material-ui/customization/dark-mode/)
 
 -   ### Backend
 
-    -   JWT token authentication with Firebase auth solutions
+    -   JWT token authentication
     -   Automatically create & destroy template tasks and anonymous user records
 
 ## Requirements
 
 1. Firebase login
 
--   The backend uses Firebase admin SDK to authenticate user (frontend on the other hand uses the [client SDK](https://firebase.google.com/docs/firestore/client/libraries)). You need to create an Firebase project and get credentials. It's free and easy. You can follow this [tutorial](https://firebase.google.com/docs/admin/setup) to create an Firebase project. After that:
+-   The backend uses [Firebase admin SDK](https://firebase.google.com/docs/reference/admin) to authenticate user (frontend on the other hand uses the [client SDK](https://firebase.google.com/docs/firestore/client/libraries)). You need to create an Firebase project and get credentials. It's free and easy. You can follow this [tutorial](https://firebase.google.com/docs/admin/setup) to create a Firebase project. After that:
 
-    1. In your Firebase project console, download the credential in JSON, open it and copy paste credentials into your .env file:
+    1. In your Firebase project console, download the credential in JSON:
 
         <img src="https://drive.google.com/uc?id=14qC9RBe_W-7_vhfcsDyptDDvuic8gQHf"
               alt=""
@@ -83,9 +83,11 @@
         mongodb+srv://username123:password123@cluster0.a9alg1l.mongodb.net/todo?retryWrites=true&w=majority
         ```
 
-        Again the DB credentals will be later placed in the .env file.
+Again the DB credentals will be later placed in the .env file.
 
 ## Install
+
+<span style="color:red">(To run the entire app you also need to install the [frontend repo](https://github.com/fjiasigmoid/task_manager_frontend))</span>
 
 Run the following command on your local environment:
 
